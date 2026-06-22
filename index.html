@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Acceso</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #0d0d0d;
+            color: #ececec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 380px;
+            padding: 2.5rem 2rem;
+            background: #1a1a1a;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            text-align: center;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        h2 {
+            margin-bottom: 2rem;
+            font-size: 1.4rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.3rem;
+            text-align: center;
+            letter-spacing: 4px;
+            background: #262626;
+            border: 2px solid #333;
+            border-radius: 14px;
+            color: #fff;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #5c67ff;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background: #5c67ff;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            touch-action: manipulation;
+        }
+
+        button:active {
+            transform: scale(0.95);
+            background: #4a54e8;
+        }
+
+        #msg {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            min-height: 1.2em;
+            font-weight: 500;
+        }
+
+        .error-text { color: #ff5252; }
+        .success-text { color: #4ade80; }
+
+        /* Animación de error */
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(3px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+            40%, 60% { transform: translate3d(5px, 0, 0); }
+        }
+
+        /* Animación de éxito */
+        .success-exit {
+            transform: scale(1.05);
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="login-box">
+        <h2>Ingresar código</h2>
+        <div class="input-group">
+            <input type="text" id="codigo" inputmode="numeric" pattern="[0-9]*" placeholder="••••••••" maxlength="8" autocomplete="off">
+        </div>
+        <button id="btn-validar">Acceder</button>
+        <p id="msg"></p>
+    </div>
+
+    <script>
+        const TARGET_CODE = '12254173';
+        const DESTINATION_URL = 'https://drive.google.com/file/d/1yJ7CzlHaoFKOyUyMsuUYc2FljBWDiEVm/view?usp=sharing'; // Cambia esta URL
+
+        const btn = document.getElementById('btn-validar');
+        const input = document.getElementById('codigo');
+        const msg = document.getElementById('msg');
+        const box = document.getElementById('login-box');
+
+        function validar() {
+            const val = input.value.trim();
+
+            if (val === TARGET_CODE) {
+                // Estado: Correcto
+                msg.textContent = 'Código correcto';
+                msg.className = 'success-text';
+                input.style.borderColor = '#4ade80';
+                
+                // Deshabilitar input y botón
+                input.disabled = true;
+                btn.disabled = true;
+
+                // Animación y redirección
+                setTimeout(() => {
+                    box.classList.add('success-exit');
+                }, 400);
+
+                setTimeout(() => {
+                    window.location.href = DESTINATION_URL;
+                }, 1000);
+
+            } else {
+                // Estado: Incorrecto
+                msg.textContent = 'Código erróneo';
+                msg.className = 'error-text';
+                input.style.borderColor = '#ff5252';
+
+                // Reiniciar y aplicar shake
+                box.classList.remove('shake');
+                void box.offsetWidth; // Forzar reflow del DOM
+                box.classList.add('shake');
+
+                // Resetear estado visual tras el error
+                setTimeout(() => {
+                    input.value = '';
+                    input.style.borderColor = '#333';
+                    msg.textContent = '';
+                }, 1000);
+            }
+        }
+
+        btn.addEventListener('click', validar);
+
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validar();
+                // Ocultar teclado en móvil al darle a enter
+                input.blur(); 
+            }
+        });
+    </script>
+</body>
+</html>
